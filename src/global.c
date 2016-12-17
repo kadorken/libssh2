@@ -66,6 +66,9 @@ libssh2_exit(void)
     _libssh2_initialized--;
 
     if (!(_libssh2_init_flags & LIBSSH2_INIT_NO_CRYPTO)) {
+#if LIBSSH2_AES_CTR
+		_libssh2_cleanup_aes_ctr();
+#endif
         libssh2_crypto_exit();
     }
 

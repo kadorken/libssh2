@@ -465,16 +465,23 @@ _libssh2_EVP_aes_256_ctr(void)
         make_ctr_evp (32, &aes_ctr_cipher, 0) : &aes_ctr_cipher;
 #endif
 }
-
+static const EVP_CIPHER *aes_ciphers[3];
 void _libssh2_init_aes_ctr(void)
 {
-    _libssh2_EVP_aes_128_ctr();
-    _libssh2_EVP_aes_192_ctr();
-    _libssh2_EVP_aes_256_ctr();
+	aes_ciphers[0] = _libssh2_EVP_aes_128_ctr();
+	aes_ciphers[1] = _libssh2_EVP_aes_192_ctr();
+	aes_ciphers[2] = _libssh2_EVP_aes_256_ctr();
 }
-
+void _libssh2_cleanup_aes_ctr(void) {
+#ifdef HAVE_OPAQUE_STRUCTS
+	EVP_CIPHER_meth_free(aes_ciphers[0]);
+	EVP_CIPHER_meth_free(aes_ciphers[1]);
+	EVP_CIPHER_meth_free(aes_ciphers[2]);
+#endif
+}
 #else
 void _libssh2_init_aes_ctr(void) {}
+void _libssh2_cleanup_aes_ctr(void) {}
 #endif /* LIBSSH2_AES_CTR */
 
 /* TODO: Optionally call a passphrase callback specified by the
